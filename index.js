@@ -3,6 +3,9 @@ const app = express();
 const { User, Kitten } = require("./db");
 const jwt = require("jsonwebtoken");
 process.env.JWT_SECRET = "neverTell";
+const bcrypt = require("bcrypt");
+const saltCount = 10;
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -38,9 +41,13 @@ const setUser = async (req, res, next) => {
 
 // POST /register
 // OPTIONAL - takes req.body of {username, password} and creates a new user with the hashed password
-app.post("/register", setUser, async (req, res, next) => {
-  console.log(req.user);
-  res.send("register route");
+app.post("/register", async (req, res, next) => {
+  const {username, password} = req.body;
+  const hashedPW = await bcrypt.hash(password, saltCount);
+  const user =await User.create({username, password: hashedPW});
+
+  const token = jwt.sign({id: user.id, username: user.username}, JWT_SECRET);
+  res.send({ message: "success", token})
 });
 
 // POST /login
@@ -79,6 +86,20 @@ app.post("/kittens", setUser, async (req, res, next) => {
 
 // DELETE /kittens/:id
 // TODO - takes an id and deletes the cat with that id
+app.delete("/kittens/:id", setUser, async(req,res,next) => {
+  if(!req.user) {
+    res.sendStatus(401);
+  } else {
+    const kitten = await Kitten.findByPk(req.params.id);
+    if(kitten.ownerId !== req.user.id) {
+      res.sendStatus(401);
+    } else {
+      await kitten.destroy();
+      res.sendStatus(204);
+    }
+  }
+})
+
 
 // error handling middleware, so failed tests receive them
 app.use((error, req, res, next) => {
