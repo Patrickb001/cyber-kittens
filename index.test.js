@@ -54,7 +54,7 @@ describe("Endpoints", () => {
     });
   });
 
-  describe.skip("login and register", () => {
+  describe("login and register", () => {
     describe("POST /register", () => {
       it("should send back success with token", async () => {
         expect(registerResponse.status).toBe(200);
@@ -80,28 +80,28 @@ describe("Endpoints", () => {
       });
     });
 
-    describe("POST /login", () => {
-      it("should send back success with token", async () => {
-        expect(loginResponse.status).toBe(200);
-        expect(loginResponse.body).toEqual({
-          message: "success",
-          token: expect.stringMatching(
-            /^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/
-          ),
-        });
-      });
-      it("if password incorrect, should send back 401 unauthorized, with message", async () => {
-        const incorrectLoginResponse = await request(app)
-          .post("/login")
-          .send({
-            username: "buster",
-            password: "notright",
-          })
-          .catch((err) => console.error(err));
-        expect(incorrectLoginResponse.status).toBe(401);
-        expect(incorrectLoginResponse.text).toBe("Unauthorized");
-      });
-    });
+    // describe("POST /login", () => {
+    //   it("should send back success with token", async () => {
+    //     expect(loginResponse.status).toBe(200);
+    //     expect(loginResponse.body).toEqual({
+    //       message: "success",
+    //       token: expect.stringMatching(
+    //         /^[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+\.[a-zA-Z0-9\-_]+$/
+    //       ),
+    //     });
+    //   });
+    //   it("if password incorrect, should send back 401 unauthorized, with message", async () => {
+    //     const incorrectLoginResponse = await request(app)
+    //       .post("/login")
+    //       .send({
+    //         username: "buster",
+    //         password: "notright",
+    //       })
+    //       .catch((err) => console.error(err));
+    //     expect(incorrectLoginResponse.status).toBe(401);
+    //     expect(incorrectLoginResponse.text).toBe("Unauthorized");
+    //   });
+    // });
   });
 
   describe("/kittens endpoints", () => {
